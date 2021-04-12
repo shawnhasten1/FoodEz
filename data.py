@@ -1,9 +1,18 @@
 import requests
 import json
+from decimal import Decimal, InvalidOperation
 
 class foodez(): 
     def __init__(self):
         print("Class Started")
+        self.twoPlaces = Decimal('0.01')
+
+    def _getDecimal(self, value):
+        try:
+            value = Decimal(value).quantize(self.twoPlaces)
+        except:
+            value = Decimal(0)
+        return str(value)
 
     def getFood(self, upc):
         url = 'https://fdc.nal.usda.gov/portal-data/external/search'
@@ -77,6 +86,18 @@ class foodez():
 
         foodData = {}
 
+        url = 'https://api.upcitemdb.com/prod/trial/lookup?upc='+ str(upc)
+        req = requests.get(url)
+        reqJson = req.json()
+        try:
+            img = reqJson['items'][0]['images'][0]
+        except:
+            img = None
+        try:
+            cleanName = reqJson['items'][0]['offers'][0]['title']
+        except:
+            cleanName = None
+
         url = 'https://api.edamam.com/api/food-database/v2/parser?upc='+ str(upc) +'&app_id=a5673f68&app_key=19e3c97afd04e087d29c808aaaa54418'
 
         #input1 = input()
@@ -104,17 +125,36 @@ class foodez():
             req = requests.post(url, json=dataSent)
             reqJson = req.json()
 
-            foodData["name"] = reqJson["ingredients"][0]["parsed"][0]["food"]
+            #return reqJson
+
+            if cleanName:
+                foodData["name"] = cleanName
+            else:
+                foodData["name"] = reqJson["ingredients"][0]["parsed"][0]["food"]
             foodData["labels"] = reqJson["healthLabels"]
-            foodData["ingredients"] = reqJson["ingredients"][0]["parsed"][0]["foodContentsLabel"]
+            foodData["ingredients"] = reqJson["ingredients"][0]["parsed"][0]["foodContentsLabel"].split('; ')
+            foodData['img'] = img
 
             foodNutr = reqJson["totalNutrients"]
+            totalDaily = reqJson["totalDaily"]
             foodData['values'] = {}
 
             for key in foodNutr.keys():                
                 nutrLabel = foodNutr[key]["label"]
-                value = str(foodNutr[key]["quantity"]) + " " + str(foodNutr[key]["unit"])
-                foodData['values'][nutrLabel] = {'description' : '', 'value' : value}
+                value = self._getDecimal(foodNutr[key]["quantity"]) + " " + str(foodNutr[key]["unit"])
+                foodData['values'][nutrLabel] = {
+                    'description' : nutrLabel, 
+                    'nutrLabel' : nutrLabel, 
+                    'value' : value,
+                    'quantity' : self._getDecimal(foodNutr[key]["quantity"])
+                }
+
+            for key in totalDaily.keys():            
+                nutrLabel = foodNutr[key]["label"]
+                if foodData['values'].get(nutrLabel):           
+                    foodData['values'][nutrLabel]['percDaily'] = self._getDecimal(totalDaily[key]['quantity'])
+                else:
+                    foodData['values'][nutrLabel]['percDaily'] = self._getDecimal(0)
             return foodData
 
         except:
@@ -148,13 +188,18 @@ class foodez():
             foodData["labels"] = ''
             foodNutrients = reqJson['foods'][0]['foodNutrients']
             foodIngredients = reqJson['foods'][0]['ingredients']
+            foodData['img'] = img
 
             foodData["ingredients"] = foodIngredients
-            foodData['values'] = {}
+            foodData['values'] = []
             
             for x in range(0, len(foodNutrients)):
                 nutr = foodNutrients[x]
                 nutrLabel = nutr['nutrientName']
                 value = str(nutr['value']) + " " + str(nutr['unitName'])
-                foodData['values'][nutrLabel] = {'description' : nutr['derivationDescription'], 'value' : value}
+                foodData['values'].append({
+                    'description' : nutr['derivationDescription'], 
+                    'nutrLabel' : nutrLabel, 
+                    'value' : value
+                })
             return foodData

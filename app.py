@@ -14,7 +14,7 @@ foodez = data.foodez()
 # A welcome message to test our server
 @app.route('/')
 def index():
-    return render_template('scan.html')
+    return render_template('scan-new.html')
 
 @app.route('/api/v1/getFood')
 def getViewEntries():
@@ -35,4 +35,4 @@ def getEdamamEntries():
 
 if __name__ == '__main__':
     # Threaded option to enable multiple instances for multiple user access support
-    app.run(threaded=True, port=80)
+    app.run(threaded=True, port=80, debug=True)
