@@ -9,30 +9,34 @@ import data
 app = Flask(__name__)
 app.config["JSONIFY_PRETTYPRINT_REGULAR"] = True
 
-foodez = data.foodez()
+lolData = data.lolData()
 
 # A welcome message to test our server
 @app.route('/')
 def index():
-    return render_template('scan-new.html')
+    return render_template('index.html')
 
-@app.route('/api/v1/getFood')
-def getViewEntries():
-    upc = request.args.get('upc')
-    
-    food = foodez.getFood(upc)
+@app.route('/api/v1/getLeagues')
+def getLeagues():    
+    leagues = lolData.getLeagues()
 
-    return jsonify(food)
+    return jsonify(leagues)
 
-@app.route('/api/v1/getEdamam')
-def getEdamamEntries():
-    print("Searching")
-    upc = request.args.get('upc')
-    
-    food = foodez.getEdamam(upc)
+@app.route('/api/v1/getSchedule')
+def getSchedule():
+    leagueIDs = request.args.get('league')
+    leagueIDSplit = leagueIDs.split(',')
+    leagues = lolData.getSchedule(leagueIDSplit)
 
-    return jsonify(food)
+    return jsonify(leagues)
+
+@app.route('/api/v1/getMatchDetails')
+def getMatchDetails():
+    matchID = request.args.get('match')
+    match = lolData.getMatchDetails(matchID)
+
+    return jsonify(match)
 
 if __name__ == '__main__':
     # Threaded option to enable multiple instances for multiple user access support
-    app.run(threaded=True, port=80, debug=True)
+    app.run(host="0.0.0.0", threaded=True, port=5002, debug=True)

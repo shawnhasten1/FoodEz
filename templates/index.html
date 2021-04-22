@@ -1,0 +1,96 @@
+<html>
+    <head>
+        <title>Home Page</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.1/css/bootstrap-select.css" />
+        <script src="https://cdn.jsdelivr.net/npm/vue"></script>
+        
+        <link rel="stylesheet" href="static/css/base.css" />
+        <style>
+            @media only screen and (max-width: 600px) {
+                .col-10{
+                    padding-right:0px !important;
+                }
+                .number-date{
+                    margin-left: -20px;
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container"><!-- Button trigger modal -->
+            <ul id="leagueHolderVue" class="col-12 row justify-content-center">
+                <li v-for="item in items" v-bind:league="item.id" class="col-lg-3 col-sm-12 league-card">
+                    <div class="col-4" style="display: inline-block;">
+                        <img v-bind:src="item.image" width="120">
+                    </div>
+                    <div class="col-7" style="display: inline-block;">
+                        <div class="col-12">[[ item.name ]]</div>
+                    </div>
+                </li>
+            </ul>
+            <div class="col-12 row justify-content-center" id="leagueSchedule">
+                <div class="schedule-blocks col-12" v-for="(value, name) in items">
+                    <h3 style="color: white;">[[ name ]]</h3>
+                    <div v-for="(value, name) in value">
+                        <div class="col-1 align-top justify-content-center" style="display: inline-block; text-align:center;">
+                            <br>
+                            <div class="number-date"><strong>[[getMonth(name)]]</strong></div>
+                        </div>
+                        <div class="col-10" style="display: inline-block;">
+                            <ul class="list-group list-group-flush"v-for="(value, name) in value">
+                                <li class="list-group-item" v-bind:match="name" data-toggle="modal" data-target="#exampleModal">
+                                    <div v-for="(value, name) in value">
+                                        <div class="col-9" style="display: inline-block;">
+                                            <img v-bind:src="value.image" width="30"> [[name]]
+                                        </div>
+                                        <div class="col-2" style="display: inline-block; text-align: right;">
+                                            [[value.wins]]
+                                        </div>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Modal -->
+        <div class="modal fade bd-example-modal-lg" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+          <div class="modal-dialog modal-lg" role="document" style="width: 80vw">
+            <div class="modal-content" style="background-color: #222;">
+              <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <div class="modal-body">
+                <div class="row">
+                    <div class="col-2" style="display: inline-block; padding: 1em;">
+                        GAME
+                    </div>
+                    <div class="col-2 gameSelector" v-for="item in items" v-if="item.state === 'completed'" v-bind:game="item.id" style="display: inline-block;">
+                        [[ item.number ]]
+                    </div>
+                </div>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <script src="static/vendor/jquery/jquery.min.js"></script>
+        <script src="static/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+      
+        <!-- Core plugin JavaScript-->
+        <script src="static/vendor/jquery-easing/jquery.easing.min.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.bundle.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.1/js/bootstrap-select.min.js"></script>
+        <!--<script src="static/js/leagues.js"></script>-->
+        <script src="static/js/leagueScheduleVue.js"></script>
+    </body>
+</html>
