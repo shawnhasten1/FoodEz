@@ -1,5 +1,8 @@
 # LeagueAPI
 
+## Live Link
+http://league.ddns.net
+
 ## Overview
 
 The purpose of this project is to display the full schedule for this season of League of Legends and display it in a clean and visible way.
